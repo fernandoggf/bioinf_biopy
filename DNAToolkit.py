@@ -92,3 +92,4 @@ def gc_subcontent(seq: str, k_spaces: int):
         return temp_result
     else:
         return False
+
