@@ -17,3 +17,5 @@ print(reverse_complement(rndSEQ))
 pretty_helix(rndSEQ)
 print(gc_content(rndSEQ))
 print(gc_subcontent(rndSEQ, 10)) 
+
+print(translate(rndSEQ, 0))
