@@ -216,3 +216,4 @@ def six_pack(seq: str):
         return frames
     else:
         return False
+ # Next look for proteins
