@@ -9,12 +9,84 @@
 #---------------------------------------------------------------------------------------------------------------------#
 #----------------------------------------[-libs & metods-]------------------------------------------------------------#
 import random
-import collections
+import collections 
+from collections import Counter
+from collections import defaultdict
 #-------------------------------------------[-globals-]---------------------------------------------------------------#
 nucleotides = ['A', 'C', 'G', 'T']
 reverse_nucleotides = {'A':'T', 'C':'G', 'G':'C', 'T':'A'}
+codon_table = {
+    'TCA': 'S',    # Serina
+    'TCC': 'S',    # Serina
+    'TCG': 'S',    # Serina
+    'TCT': 'S',    # Serina
+    'TTC': 'F',    # Fenilalanina
+    'TTT': 'F',    # Fenilalanina
+    'TTA': 'L',    # Leucina
+    'TTG': 'L',    # Leucina
+    'TAC': 'Y',    # Tirosina
+    'TAT': 'Y',    # Tirosina
+    'TAA': '*',    # Stop
+    'TAG': '*',    # Stop
+    'TGC': 'C',    # Cisteina
+    'TGT': 'C',    # Cisteina
+    'TGA': '*',    # Stop
+    'TGG': 'W',    # Triptofano
+    'CTA': 'L',    # Leucina
+    'CTC': 'L',    # Leucina
+    'CTG': 'L',    # Leucina
+    'CTT': 'L',    # Leucina
+    'CCA': 'P',    # Prolina
+    'CCC': 'P',    # Prolina
+    'CCG': 'P',    # Prolina
+    'CCT': 'P',    # Prolina
+    'CAC': 'H',    # Histidina
+    'CAT': 'H',    # Histidina
+    'CAA': 'Q',    # Glutamina
+    'CAG': 'Q',    # Glutamina
+    'CGA': 'R',    # Arginina
+    'CGC': 'R',    # Arginina
+    'CGG': 'R',    # Arginina
+    'CGT': 'R',    # Arginina
+    'ATA': 'I',    # Isoleucina
+    'ATC': 'I',    # Isoleucina
+    'ATT': 'I',    # Isoleucina
+    'ATG': 'M',    # Methionina
+    'ACA': 'T',    # Treonina
+    'ACC': 'T',    # Treonina
+    'ACG': 'T',    # Treonina
+    'ACT': 'T',    # Treonina
+    'AAC': 'N',    # Asparagina
+    'AAT': 'N',    # Asparagina
+    'AAA': 'K',    # Lisina
+    'AAG': 'K',    # Lisina
+    'AGC': 'S',    # Serina
+    'AGT': 'S',    # Serina
+    'AGA': 'R',    # Arginina
+    'AGG': 'R',    # Arginina
+    'GTA': 'V',    # Valina
+    'GTC': 'V',    # Valina
+    'GTG': 'V',    # Valina
+    'GTT': 'V',    # Valina
+    'GCA': 'A',    # Alanina
+    'GCC': 'A',    # Alanina
+    'GCG': 'A',    # Alanina
+    'GCT': 'A',    # Alanina
+    'GAC': 'D',    # Acido Aspartico
+    'GAT': 'D',    # Acido Aspartico
+    'GAA': 'E',    # Acido Glutamico
+    'GAG': 'E',    # Acido Glutamico
+    'GGA': 'G',    # Glicina
+    'GGC': 'G',    # Glicina
+    'GGG': 'G',    # Glicina
+    'GGT': 'G'     # Glicina
+}
+#-------------------------------------------[-precode-]---------------------------------------------------------------#
+amino_table = defaultdict(list)
+for codon, aa in codon_table.items():
+    amino_table[aa].append(codon)
 #------------------------------------------[-functions-]--------------------------------------------------------------#
-## TODO: pretty printing, colors in console printing (video part 2)
+## TODO: pretty printing, colors in console printing (video part 2), documenting every function
 
 def validate_sequence(seq: str):
     temp_seq = seq.upper()
@@ -61,14 +133,16 @@ def transcription_seq(seq: str):
 def reverse_complement(seq: str):
     temp_seq = validate_sequence(seq)
     if temp_seq:
-        return ''.join([reverse_nucleotides[nuc] for nuc in seq])[::-1]
+        temp_reverse = ([reverse_nucleotides[nuc] for nuc in seq])
+        temp_reverse = ''.join(temp_reverse[::1])
+        return temp_reverse
     else:
         return False
     
 def pretty_helix(seq: str):
     temp_seq = validate_sequence(seq)
     if temp_seq:
-        temp_reverse = ''.join([reverse_nucleotides[nuc] for nuc in seq])[::-1]
+        temp_reverse = reverse_complement(temp_seq)
         print(f"5' {temp_seq} 3'")
         print(f"   {''.join(['|' for char in range(len(temp_seq))])}")
         print(f"3' {temp_reverse} 5'")
@@ -93,3 +167,52 @@ def gc_subcontent(seq: str, k_spaces: int):
     else:
         return False
 
+def translation(seq: str, ORF: int):
+    temp_seq = validate_sequence(seq)
+    if temp_seq:
+        temp_trans = [codon_table[temp_seq[pos:pos+3]] for pos in range(ORF, len(temp_seq)-2, 3)]
+        return temp_trans
+    else:
+        return False
+    
+def codon_usage_ind(seq: str, aminoacid: str):
+    temp_seq = validate_sequence(seq)
+    if temp_seq:
+        temp_list = []
+        for i in range(0, len(temp_seq)-2, 3):
+            if codon_table[temp_seq[i:i+3]] == aminoacid:
+                temp_list.append(temp_seq[i:i+3])
+        temp_dict = dict(Counter((temp_list)))
+        total_weight = sum(temp_dict.values())
+        for seqs in temp_dict:
+            temp_dict[seqs] = round(temp_dict[seqs] / total_weight, 2)
+        return temp_dict
+    else:
+        return False
+
+def codon_usage_total(seq: str):
+    temp_seq = validate_sequence(seq)
+    if temp_seq:
+        temp_list = []
+        for i in range(0, len(temp_seq)-2, 3):
+            if codon_table[temp_seq[i:i+3]] in amino_table:
+                temp_list.append(temp_seq[i:i+3])
+        temp_dict = dict(Counter((temp_list)))
+        total_weight = sum(temp_dict.values())
+        for seqs in temp_dict:
+            temp_dict[seqs] = round(temp_dict[seqs] / total_weight, 3)
+        return temp_dict
+    else:
+        return False
+    
+def six_pack(seq: str):
+    temp_seq = validate_sequence(seq)
+    if temp_seq:
+        frames = []
+        for i in range(0,3):
+            frames.append(translation(temp_seq, i))
+        for i in range(0,3):
+            frames.append(translation(reverse_complement(temp_seq), i))
+        return frames
+    else:
+        return False
