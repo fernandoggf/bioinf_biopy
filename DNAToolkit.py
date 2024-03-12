@@ -216,4 +216,41 @@ def six_pack(seq: str):
         return frames
     else:
         return False
- # Next look for proteins
+ 
+def single_cds_find(aa_seq: str):
+    temp_cds = []
+    cds = []
+    for aa in aa_seq:
+        if aa == '*':
+            if temp_cds:
+                cds.append(temp_cds)
+                temp_cds = []
+        else: 
+            if aa == 'M':
+                temp_cds.append('')
+            for i in range(len(temp_cds)):
+                temp_cds[i] += aa 
+    return cds
+
+def cds_sixpack_find(seq: str):
+    temp_seq = validate_sequence(seq)
+    if temp_seq:
+        temp_frames = six_pack(temp_seq)
+        six_pack_cds = []
+        for orf in temp_frames:
+            six_pack_cds.append(single_cds_find(orf))
+        return six_pack_cds
+    else:
+        return False
+    
+def cds_sixpack_scan(seq: str, start_pos: int, end_pos: int):
+    if end_pos > start_pos:
+        temp_seq = validate_sequence(seq[start_pos:end_pos])
+        if temp_seq:
+            return cds_sixpack_find(temp_seq)
+        else:
+            return False
+    else:
+        return False
+
+# Next ncbi python api, make class functions
