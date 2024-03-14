@@ -10,10 +10,10 @@ import csv
 
 # main doc https://www.ncbi.nlm.nih.gov/books/NBK25500/
 
-#project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-dbs = []
 
-ncbi_dbs = pd.read_table(r"C:\Users\FernandoGonzálezGarc\Documents\bioinf\bioinf_py\bioinf_biopy\entrez_databases.tsv")
+#project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+path = r"C:\Users\FernandoGonzálezGarc\Documents\bioinf\bioinf_py\bioinf_biopy\entrez_databases.tsv"
+ncbi_dbs = pd.read_table(path)
 entrez_dbs = ncbi_dbs['E-utility Database Name'].tolist()
 
 
