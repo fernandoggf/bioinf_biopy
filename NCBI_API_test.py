@@ -42,7 +42,40 @@ global: egquery.fcgi?term=<query>
 
 '''
 
-# url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=3269'
+class entrez_API:
+    def __init__(self,
+                toolname: str,
+                email: str,
+                ret_type: str,
+                api_key: str = None,
+                timeout: float = 10,
+                url_base: str = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
+                ):
+        self.url_base = url_base
+        self.toolname = toolname
+        self.email = email
+        self.ret_type: str
+        self.api_key = api_key
+        self.timeout = timeout
+    
+    def _args(self):
+        return {
+            'toolname': self.toolname,
+            'email': self.email,
+            'api_key': self.api_key
+        }
+    
+    def _req(self, action: str, ncbi_database: str, id: list[str], rettype: str):
+        # TODO:  validate args in
+        params = self._args()
+
+        construct = f'{actions[action]}db={ncbi_database}&id={id}&rettype={rettype}'
+        print(construct)
+
+my_api = entrez_API('tool', 'fer.com', 'fasta')
+
+my_api._req('summary', 'genome', '1244', 'fasta')
+
 
 # base_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
 # action = 'esumary.fcgi?'
