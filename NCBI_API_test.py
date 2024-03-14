@@ -1,7 +1,20 @@
+
+import os
+import sys 
+import pandas as pd
+import numpy as np
 import requests
 import xmltodict
+from xml.etree import ElementTree
+import csv
 
 # main doc https://www.ncbi.nlm.nih.gov/books/NBK25500/
+
+#project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+dbs = []
+
+ncbi_dbs = pd.read_table(r"C:\Users\FernandoGonzálezGarc\Documents\bioinf\bioinf_py\bioinf_biopy\entrez_databases.tsv")
+entrez_dbs = ncbi_dbs['E-utility Database Name'].tolist()
 
 
 actions = {'search':'esearch.fcgi?',
@@ -29,19 +42,19 @@ global: egquery.fcgi?term=<query>
 
 '''
 
-url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=3269'
+# url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=3269'
 
-base_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
-action = 'esumary.fcgi?'
-db = 'db=gene'
-query = '&id=3269'
-#TODO: construct the url complete
+# base_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
+# action = 'esumary.fcgi?'
+# db = 'db=gene'
+# query = '&id=3269'
+# #TODO: construct the url complete
 
-response = requests.get(url)
-if response.status_code == 200:
-    data = xmltodict.parse(response.text)
-    print(data)
-else:
-    print(f"Failed to fetch data. Status code: {response.status_code}")
+# response = requests.get(url)
+# if response.status_code == 200:
+#     data = xmltodict.parse(response.text)
+#     print(data)
+# else:
+#     print(f"Failed to fetch data. Status code: {response.status_code}")
 
 
