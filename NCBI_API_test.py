@@ -42,6 +42,18 @@ global: egquery.fcgi?term=<query>
 
 '''
 
+class entrez_API:
+    def __init__(self,
+                toolname: str,
+                email: str,
+                api_key: str = None) -> None:
+        a = 1 
+        
+entrez_API()
+        
+
+
+
 # url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=3269'
 
 # base_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
