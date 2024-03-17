@@ -1,27 +1,31 @@
 
 import os
 import sys 
+import csv
+import time
 import pandas as pd
 import numpy as np
 import requests
 import xmltodict
 from xml.etree import ElementTree
-import csv
+from time import sleep
+
 
 # main doc https://www.ncbi.nlm.nih.gov/books/NBK25500/
 
-
-#project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-path = r"C:\Users\FernandoGonzálezGarc\Documents\bioinf\bioinf_py\bioinf_biopy\entrez_databases.tsv"
-ncbi_dbs = pd.read_table(path)
+project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+ncbi_dbs = pd.read_table(os.path.join(project_dir, 'bioinf_biopy', 'entrez_databases.tsv'))
 entrez_dbs = ncbi_dbs['E-utility Database Name'].tolist()
-
 
 actions = {'search':'esearch.fcgi?',
            'summary':'esummary.fcgi?',
            'full_download':'efetch.fcgi?',
            'linking':'elink.fcgi?',
            'global':'egquery.fcgi?'}
+
+retrieve_type = ['fasta', 'gbwithparts', 'gb', 'uilist', 'abstract', 'pdb']
+
+retrieve_mode = ['xml', 'json', 'html']
 
 ''' Syntax of actions
 search: esearch.fcgi?db=<database>&term=<query>
@@ -46,10 +50,11 @@ class entrez_API:
     def __init__(self,
                 toolname: str,
                 email: str,
-                ret_type: str,
+                #ret_type: str,
                 api_key: str = None,
                 timeout: float = 10,
-                url_base: str = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
+                url_base: str = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/',
+                min_time_gdl: float = 0.338
                 ):
         self.url_base = url_base
         self.toolname = toolname
@@ -57,6 +62,7 @@ class entrez_API:
         self.ret_type: str
         self.api_key = api_key
         self.timeout = timeout
+        self.last_req = None
     
     def _args(self):
         return {
@@ -65,29 +71,56 @@ class entrez_API:
             'api_key': self.api_key
         }
     
-    def _req(self, action: str, ncbi_database: str, id: list[str], rettype: str):
-        # TODO:  validate args in
-        params = self._args()
-
-        construct = f'{actions[action]}db={ncbi_database}&id={id}&rettype={rettype}'
+    # TODO: input parameter termo to access like this example https://www.ncbi.nlm.nih.gov/nuccore?term=homo%20sapiens%5BOrganism%5D
+    def _req(self, action: str, ncbi_database: str, id: list[str], rettype: str, retmode: str = 'xml'):
+        param = self._args()
+        # Validate inputs
+        if action not in actions:
+            print('User error EU1: invalid action to do')
+            sys.exit()
+        if ncbi_database not in entrez_dbs:
+            print('User error EU2: invalid database to access')
+            sys.exit() 
+        if rettype not in retrieve_type:
+            print('User error EU3: invalid retrieve type to pass')
+            sys.exit()
+        if retmode not in retrieve_mode:
+            print('User error EU4: invalid retrieve mode to receive')
+            sys.exit()
+        
+        # Construction of url
+        construct = f'{self.url_base}{actions[action]}db={ncbi_database}&id={id}&rettype={rettype}&retmode={retmode}'
         print(construct)
 
-my_api = entrez_API('tool', 'fer.com', 'fasta')
+        # time validation to handle guidelines
+        current_time = time.time()
+        if self.last_req != None:
+            time_btwn = current_time - self.last_req
+            if time_btwn < self.min_time_gdl:
+                time_to_wait = self.min_time_gdl - time_btwn
+                sleep(time_to_wait)
+        self.last_req = current_time
 
-my_api._req('summary', 'genome', '1244', 'fasta')
+        # request handle
+        try:
+            response = requests.get(construct, params=param, timeout=self.timeout)
+            if response.status_code == 200:
+                # TODO: make a list the reponse
+                print(response.text)
+            else:
+                print(f"Request failed with status code {response.status_code}")
+        except requests.exceptions.Timeout:
+            print("Timeout error: The request took too long to complete.")
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
 
 
-# base_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
-# action = 'esumary.fcgi?'
-# db = 'db=gene'
-# query = '&id=3269'
-# #TODO: construct the url complete
+def main():
+    my_api = entrez_API('ret_tool', 'fernando.ggfigueroa@icloud.com')
 
-# response = requests.get(url)
-# if response.status_code == 200:
-#     data = xmltodict.parse(response.text)
-#     print(data)
-# else:
-#     print(f"Failed to fetch data. Status code: {response.status_code}")
+    my_api._req('summary', 'nuccore', '2244', 'fasta', 'xml')
+
+if __name__ == "__main__":
+    main()
 
 
