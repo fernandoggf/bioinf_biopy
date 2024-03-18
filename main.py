@@ -1,22 +1,21 @@
-from DNAToolkit import *
+# from DNAToolkit import *
+from biobasic import *
 
-# main
-rndSEQ = validate_sequence('ATATGAGCGTAAGCATTCATTCTCTGAACTTGCGCTGCGTATTGCGGCGTAATTCTGCTTGCCGTACTGCGGTCTTGCGTACCTTGCGGTCTTGTGCGGGAGTAGCACTTGCAGCCTGA')
-print(reverse_complement(rndSEQ))
-#pretty_helix(rndSEQ)
-print(gc_content(rndSEQ))
-print(gc_subcontent(rndSEQ, 5)) 
+test = biobasic()
+print(test.random_nucs(35, 'DNA'))
+print(test.seq_info())
 
-print(translation(rndSEQ, 2))
 
-print(codon_usage_ind(rndSEQ, 'T'))
-print(codon_usage_total(rndSEQ))
+# print(translation(rndSEQ, 2))
 
-#print(six_pack(rndSEQ))
+# print(codon_usage_ind(rndSEQ, 'T'))
+# print(codon_usage_total(rndSEQ))
 
-orf = translation(rndSEQ, 2)
-print(single_cds_find(orf))
+# #print(six_pack(rndSEQ))
 
-print(cds_sixpack_find(rndSEQ))
+# orf = translation(rndSEQ, 2)
+# print(single_cds_find(orf))
 
-print(cds_sixpack_scan(rndSEQ, 0, 120))
+# print(cds_sixpack_find(rndSEQ))
+
+# print(cds_sixpack_scan(rndSEQ, 0, 120))
