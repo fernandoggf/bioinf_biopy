@@ -2,20 +2,17 @@
 from biobasic import *
 
 test = biobasic()
-print(test.random_nucs(35, 'DNA'))
+print(test.random_nucs(200, 'DNA'))
 print(test.seq_info())
 
+print(test.translation(0))
+print(test.gc_subcon_sec(5))
 
-# print(translation(rndSEQ, 2))
+print(test.codon_usage(total=True))
 
-# print(codon_usage_ind(rndSEQ, 'T'))
-# print(codon_usage_total(rndSEQ))
+for frames in test.six_pack():
+    print(frames)
 
-# #print(six_pack(rndSEQ))
+print(test.cds_sixpack_find())
 
-# orf = translation(rndSEQ, 2)
-# print(single_cds_find(orf))
-
-# print(cds_sixpack_find(rndSEQ))
-
-# print(cds_sixpack_scan(rndSEQ, 0, 120))
+print(test.cds_sixpack_scan(20, 80))
